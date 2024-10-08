@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exam Page - IT Passport Exam</title>
+  <!-- Tailwind CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Custom JavaScript -->
+  <script defer src="js/script.js"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Fixed Timer and Buttons Navbar -->
+  <div class="fixed top-0 left-0 w-full bg-white shadow-md z-10">
+    <div class="container mx-auto max-w-4xl px-4 py-3 flex justify-between items-center">
+      <div class="text-md md:text-2xl font-bold text-gray-700 flex items-center space-x-2">
+        <span class="inline-block text-gray-600 hidden sm:block">Time Left:</span>
+        <span id="timer" class="inline-block bg-gray-200 text-gray-900 px-4 py-1 rounded-lg">2:00:00</span>
+      </div>
+      <div class="flex space-x-2 sm:space-x-4">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 md:px-6 md:py-3 text-sm md:text-base rounded-lg shadow-md transition duration-200" onclick="gradeExam()">Submit</button>
+        <button class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-4 py-2 md:px-6 md:py-3 text-sm md:text-base rounded-lg shadow-md transition duration-200" onclick="exitExam()">Exit Exam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto max-w-4xl px-4 py-8 md:py-12 mt-12">
+    <!-- Instructions Section -->
+    <div id="instructions" class="bg-blue-50 border-l-4 border-blue-500 p-4 md:p-6 mb-6 rounded-lg shadow-sm">
+      <h2 class="text-lg md:text-xl font-bold text-blue-600">Instructions:</h2>
+      <p class="text-gray-600 mt-2 text-sm md:text-base">
+        You have 2 hours to complete the exam. Once you submit, your score and the time taken will be displayed.
+      </p>
+    </div>
+
+    <!-- Score and Timer Display -->
+    <div id="resultContainer" class="flex justify-between items-center mb-6 hidden">
+      <div class="text-lg md:text-2xl font-bold">
+        Score: <span id="score" class="text-green-600 bg-green-100 px-4 py-2 rounded-lg shadow-sm">0/100</span>
+      </div>
+      <div class="text-lg md:text-2xl font-bold text-gray-700 flex items-center space-x-2">
+        <span class="inline-block text-gray-600">Time Taken:</span>
+        <span id="timeTaken" class="inline-block bg-gray-200 text-gray-900 px-4 py-1 rounded-lg">120:00</span>
+      </div>
+    </div>
+
+    <!-- Questions Container -->
+    <div id="questions-container" class="space-y-8">
+      <!-- Questions will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <!-- Custom Tailwind CSS Confirmation Modal -->
+  <div id="exitModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden z-30">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Exit Exam</h2>
+      <p class="text-gray-600 mb-6">Are you sure you want to exit the exam? All your progress will be lost.</p>
+      <div class="flex justify-end space-x-4">
+        <button class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded" onclick="handleExitChoice('no')">No</button>
+        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded" onclick="handleExitChoice('yes')">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Tailwind CSS Notification for Unanswered Question -->
+  <div id="unansweredAlert" class="fixed top-0 mt-10 left-1/2 transform -translate-x-1/2 bg-red-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg hidden z-20">
+    Please answer Question
+  </div>
+
+  <!-- Custom Tailwind CSS Result Modal -->
+  <div id="resultModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden z-20">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Exam Results</h2>
+      <p id="modalScore" class="text-gray-600 mb-2"></p>
+      <p id="modalTime" class="text-gray-600 mb-6"></p>
+      <div class="flex justify-end">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded" onclick="scrollToTop()">Review Answers</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
