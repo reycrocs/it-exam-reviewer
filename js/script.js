@@ -39,7 +39,7 @@ function initializeExam() {
   if (savedQuestions) {
     selectedQuestions = JSON.parse(savedQuestions);
   } else {
-    selectedQuestions = getRandomQuestions(questions, 2);
+    selectedQuestions = getRandomQuestions(questions, 100);
     localStorage.setItem('selectedQuestions', JSON.stringify(selectedQuestions));
   }
 
