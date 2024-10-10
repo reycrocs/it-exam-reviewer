@@ -1,6 +1,5 @@
 let questions = [];
 let selectedQuestions = [];
-let timeLeft = 7200; // 2 hours in seconds
 let timerInterval = null;
 
 // Fetch and initialize exam
@@ -114,42 +113,80 @@ function displayAllQuestions(questions) {
 // Start the timer based on the start time stored in localStorage
 function startTimer() {
   const timerElement = document.getElementById('timer');
-
-  // Check if the start time is already saved in localStorage
   let startTime = localStorage.getItem('startTime');
-
-  // If there's no start time in localStorage, set it to the current time
+  
   if (!startTime) {
-    startTime = new Date().getTime(); // Current timestamp in milliseconds
-    localStorage.setItem('startTime', startTime); // Save the start time in localStorage
+    startTime = new Date().getTime();
+    localStorage.setItem('startTime', startTime);
   } else {
-    startTime = parseInt(startTime, 10); // Parse the saved start time
+    startTime = parseInt(startTime, 10);
   }
 
-  // Calculate the total time for the exam (2 hours in seconds)
-  const totalExamTime = 7200; // 2 hours in seconds (7200)
-
+  const totalExamTime = 7200;
+  
   timerInterval = setInterval(() => {
-    const currentTime = new Date().getTime(); // Current timestamp in milliseconds
-    const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Elapsed time in seconds
-
-    // Calculate the remaining time
+    const currentTime = new Date().getTime();
+    const elapsedTime = Math.floor((currentTime - startTime) / 1000);
     const timeLeft = totalExamTime - elapsedTime;
-
-    // If time is up, grade the exam
+    
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
-      gradeExam();
+      startTimerExceed()
+      showTimeUpModal(); // Show modal when time is up
     } else {
-      // Calculate hours, minutes, and seconds
       const hours = Math.floor(timeLeft / 3600);
       const minutes = Math.floor((timeLeft % 3600) / 60);
       const seconds = timeLeft % 60;
-
-      // Update the timer display (hours:minutes:seconds)
       timerElement.textContent = `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
   }, 1000);
+}
+
+// Start the timer to increment from 1 second
+function startTimerExceed() {
+  const timerElement = document.getElementById('timer');
+  timerElement.classList.add('hidden');
+
+  const timerExceedElement = document.getElementById('timer-exceed');
+  timerExceedElement.classList.remove('hidden');
+  timerExceedElement.classList.remove('text-gray-900');
+  timerExceedElement.classList.add('text-red-500');
+
+  const timeLabel = document.getElementById('time-label');
+  timeLabel.textContent = 'Time Exceed:';
+
+  let startTimeExceed = localStorage.getItem('startTimeExceed');
+
+  // If there's no start time in localStorage, set it to the current time
+  if (!startTimeExceed) {
+    startTimeExceed = new Date().getTime();
+    localStorage.setItem('startTimeExceed', startTimeExceed);
+  } else {
+    startTimeExceed = parseInt(startTimeExceed, 10);
+  }
+
+  // Start counting from 1 second
+  let elapsedSeconds = 1; // Start at 1 second
+
+  // Timer interval that updates every second
+  timerInterval = setInterval(() => {
+    // Increment elapsedSeconds each second
+    elapsedSeconds++;
+
+    const hours = Math.floor(elapsedSeconds / 3600); // Get total hours
+    const minutes = Math.floor((elapsedSeconds % 3600) / 60); // Get remaining minutes
+    const seconds = elapsedSeconds % 60; // Get remaining seconds
+
+    // Update the timer element with formatted time
+    timerExceedElement.textContent = `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }, 1000);
+}
+
+
+
+// Show Time's Up Modal
+function showTimeUpModal() {
+  document.getElementById('timeUpModal').classList.remove('hidden');
 }
 
 // Reset the timer and clear localStorage when the exam is exited or restarted
@@ -207,6 +244,7 @@ function updateSubmitButtonState() {
   const allAnswered = checkAllQuestionsAnswered();
 
   if (allAnswered) {
+    //handleConfirmation(true);
     console.log('All questions answered.');
     // Optionally, you can highlight the Submit button or provide visual feedback
   } else {
@@ -230,72 +268,97 @@ function checkAllQuestionsAnswered() {
 
 // Grade the exam
 function gradeExam() {
+  document.getElementById('timeUpModal').classList.add('hidden');
   const allAnswered = checkAllQuestionsAnswered();
+  
   if (!allAnswered) {
-    scrollToFirstUnansweredQuestion(); // Scroll to the first unanswered question
-    return; // Prevent the exam from being graded if not all questions are answered
+    // Show the custom confirmation modal if not all questions are answered
+    document.getElementById('unansweredAlert').classList.add('hidden'); // Hide any previous alerts
+    document.getElementById('confirmationModal').classList.remove('hidden');
+    return; // Exit the function to wait for user's confirmation
+  } else {
+    handleConfirmation(true);
   }
+}
 
-  clearInterval(timerInterval); // Stop the timer
+// Handle confirmation from the modal
+function handleConfirmation(userConfirmation) {
+  document.getElementById('timeUpModal').classList.add('hidden');
+  if (userConfirmation) {
+    // If user confirms, proceed to grade the exam
+    clearInterval(timerInterval); // Stop the timer
 
-  // Calculate Time Taken
-  const startTime = parseInt(localStorage.getItem('startTime'), 10); // Retrieve the start time
-  const currentTime = new Date().getTime(); // Get the current time
-  const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Time taken in seconds
-  const timeTaken = formatTimeTaken(elapsedTime); // Format the elapsed time
+    // Calculate Time Taken
+    const startTime = parseInt(localStorage.getItem('startTime'), 10); // Retrieve the start time
+    const currentTime = new Date().getTime(); // Get the current time
+    const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Time taken in seconds
+    const timeTaken = formatTimeTaken(elapsedTime); // Format the elapsed time
 
-  // Clear localStorage
-  localStorage.removeItem('answers');
-  localStorage.removeItem('timeLeft');
-  localStorage.removeItem('selectedQuestions');
-  localStorage.removeItem('startTime');
+    // Clear localStorage
+    localStorage.removeItem('answers');
+    localStorage.removeItem('timeLeft');
+    localStorage.removeItem('selectedQuestions');
+    localStorage.removeItem('startTime');
 
-  const container = document.getElementById('questions-container');
-  const questionWrappers = container.querySelectorAll('div.border'); // Target each question wrapper
-  let correctAnswersCount = 0;
+    const container = document.getElementById('questions-container');
+    const questionWrappers = container.querySelectorAll('div.border'); // Target each question wrapper
+    let correctAnswersCount = 0;
 
-  questionWrappers.forEach((questionWrapper, index) => {
-    const selectedOption = questionWrapper.querySelector('input[type="radio"]:checked');
-    const correctAnswer = selectedQuestions[index].answer;
+    questionWrappers.forEach((questionWrapper, index) => {
+      const selectedOption = questionWrapper.querySelector('input[type="radio"]:checked');
+      const correctAnswer = selectedQuestions[index].answer;
 
-    const correctAnswerDisplay = document.getElementById(`correct-answer-${index}`);
-    correctAnswerDisplay.classList.remove('hidden'); // Show the correct answer section
+      const correctAnswerDisplay = document.getElementById(`correct-answer-${index}`);
+      correctAnswerDisplay.classList.remove('hidden'); // Show the correct answer section
 
-    if (selectedOption) {
-      const selectedAnswer = selectedOption.value.toLowerCase(); // Ensure the selected answer is lowercase
-      if (selectedAnswer === correctAnswer) {
-        correctAnswerDisplay.textContent = 'Correct'; // Show "Correct"
-        correctAnswerDisplay.classList.add('text-green-500');
-        correctAnswersCount++; // Increment score for correct answer
+      if (selectedOption) {
+        const selectedAnswer = selectedOption.value.toLowerCase(); // Ensure the selected answer is lowercase
+        if (selectedAnswer === correctAnswer) {
+          correctAnswerDisplay.textContent = 'Correct'; // Show "Correct"
+          correctAnswerDisplay.classList.add('text-green-500');
+          correctAnswersCount++; // Increment score for correct answer
+        } else {
+          correctAnswerDisplay.textContent = `Wrong - The correct answer is ${correctAnswer.toUpperCase()}`; // Show correct answer if wrong
+          correctAnswerDisplay.classList.add('text-red-500');
+        }
       } else {
-        correctAnswerDisplay.textContent = `Wrong - The correct answer is ${correctAnswer.toUpperCase()}`; // Show correct answer if wrong
+        correctAnswerDisplay.textContent = `You did not answer - The correct answer is ${correctAnswer.toUpperCase()}`;
         correctAnswerDisplay.classList.add('text-red-500');
       }
-    } else {
-      correctAnswerDisplay.textContent = `You did not answer - The correct answer is ${correctAnswer.toUpperCase()}`;
-      correctAnswerDisplay.classList.add('text-red-500');
-    }
-  });
+    });
 
-  // Show score and time taken in the result container
-  const timerElement = document.getElementById('timeTaken');
-  const scoreElement = document.getElementById('score');
+    // Disable all radio buttons
+    const allRadioButtons = container.querySelectorAll('input[type="radio"]');
+    allRadioButtons.forEach(radio => {
+      radio.disabled = true; // Disable each radio button
+    });
 
-  timerElement.textContent = `${timeTaken}`; // Update the time taken display
-  scoreElement.textContent = `${correctAnswersCount}/100`; // Update the score display
+    // Show a custom modal with the score and time taken
+    showResultModal(correctAnswersCount, timeTaken);
 
-  // Make the score and time display visible
-  const resultContainer = document.getElementById('resultContainer');
-  resultContainer.classList.remove('hidden'); // Remove the 'hidden' class to show the result section
+    // Show score and time taken in the result container
+    const timerElement = document.getElementById('timeTaken');
+    const scoreElement = document.getElementById('score');
 
-  // Show a custom modal with the score and time taken
-  showResultModal(correctAnswersCount, timeTaken);
+    timerElement.textContent = `${timeTaken}`; // Update the time taken display
+    scoreElement.textContent = `${correctAnswersCount}/100`; // Update the score display
 
-  // Update the submit button to "Start Again"
-  const submitButton = document.querySelector('button[onclick="gradeExam()"]');
-  submitButton.textContent = 'Start Again';
-  submitButton.onclick = () => location.reload(); // Reload the page to restart
+    // Make the score and time display visible
+    const resultContainer = document.getElementById('resultContainer');
+    resultContainer.classList.remove('hidden');
+
+    // Update the submit button to "Start Again"
+    const submitButton = document.querySelector('button[onclick="gradeExam()"]');
+    submitButton.textContent = 'Start Again';
+    submitButton.onclick = () => location.reload(); // Reload the page to restart
+  } else {
+    // If user cancels, scroll to the first unanswered question
+    scrollToFirstUnansweredQuestion();
+  }
+  // Hide the confirmation modal after the user makes a choice
+  document.getElementById('confirmationModal').classList.add('hidden');
 }
+
 
 // Function to show a custom result modal with Tailwind CSS
 function showResultModal(score, timeTaken) {
@@ -307,6 +370,19 @@ function showResultModal(score, timeTaken) {
   modalTime.textContent = `Time Taken: ${timeTaken}`;
 
   modal.classList.remove('hidden');
+}
+
+// Check if all questions have been answered
+function checkAllQuestionsAnswered() {
+  const totalQuestions = selectedQuestions.length;
+  for (let i = 0; i < totalQuestions; i++) {
+    const selectedOption = document.querySelector(`input[name="question-${i}"]:checked`);
+    if (!selectedOption) {
+      console.log(`Question ${i + 1} is unanswered`);
+      return false;
+    }
+  }
+  return true;
 }
 
 

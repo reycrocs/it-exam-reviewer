@@ -15,8 +15,9 @@
   <div class="fixed top-0 left-0 w-full bg-white shadow-md z-10">
     <div class="container mx-auto max-w-4xl px-4 py-3 flex justify-between items-center">
       <div class="text-md md:text-2xl font-bold text-gray-700 flex items-center space-x-2">
-        <span class="inline-block text-gray-600 hidden sm:block">Time Left:</span>
+        <span id="time-label" class="inline-block text-gray-600 hidden sm:block">Time Left:</span>
         <span id="timer" class="inline-block bg-gray-200 text-gray-900 px-4 py-1 rounded-lg">2:00:00</span>
+        <span id="timer-exceed" class="inline-block bg-gray-200 text-gray-900 px-4 py-1 rounded-lg hidden">0:00:00</span>
       </div>
       <div class="flex space-x-2 sm:space-x-4">
         <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 md:px-6 md:py-3 text-sm md:text-base rounded-lg shadow-md transition duration-200" onclick="gradeExam()">Submit</button>
@@ -42,7 +43,7 @@
       </div>
       <div class="text-lg md:text-2xl font-bold text-gray-700 flex items-center space-x-2">
         <span class="inline-block text-gray-600">Time Taken:</span>
-        <span id="timeTaken" class="inline-block bg-gray-200 text-gray-900 px-4 py-1 rounded-lg">120:00</span>
+        <span id="timeTaken" class="inline-block bg-gray-200 text-gray-900 px-4 py-1 rounded-lg">00:00</span>
       </div>
     </div>
 
@@ -64,6 +65,31 @@
     </div>
   </div>
 
+    <!-- Custom Tailwind CSS Times up Modal -->
+    <div id="timeUpModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden z-30">
+      <div class="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Times Up!</h2>
+        <p class="text-gray-600 mb-6">Do you want to continue or submit exam?</p>
+        <div class="flex justify-end space-x-4">
+          <button class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded" onclick="handleConfirmation(false)">Continue</button>
+          <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded" onclick="handleConfirmation(true)">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Tailwind CSS Confirmation Modal -->
+    <div id="confirmationModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden z-30">
+      <div class="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Confirmation</h2>
+        <p class="text-gray-600 mb-6">You have unanswered questions. Do you still want to submit the exam?</p>
+        <div class="flex justify-end space-x-4">
+          <button class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded" onclick="handleConfirmation(false)">No</button>
+          <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded" onclick="handleConfirmation(true)">Yes</button>
+        </div>
+      </div>
+    </div>
+
+
   <!-- Custom Tailwind CSS Notification for Unanswered Question -->
   <div id="unansweredAlert" class="fixed top-0 mt-10 left-1/2 transform -translate-x-1/2 bg-red-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg hidden z-20">
     Please answer Question
@@ -80,6 +106,5 @@
       </div>
     </div>
   </div>
-
 </body>
 </html>
