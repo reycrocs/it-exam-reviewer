@@ -70,7 +70,7 @@ function displayAllQuestions(questions) {
 
     const correctAnswerDisplay = document.createElement('div');
     correctAnswerDisplay.id = `correct-answer-${index}`;
-    correctAnswerDisplay.classList.add('mb-4', 'text-lg', 'font-bold', 'hidden');
+    correctAnswerDisplay.classList.add('mb-4', 'text-sm', 'sm:text-lg', 'font-bold', 'hidden');
 
     const optionsWrapper = document.createElement('div');
     optionsWrapper.classList.add('flex', 'justify-center', 'space-x-6'); // Always horizontal layout
